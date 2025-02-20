@@ -1,0 +1,13 @@
+services:
+  dev-environment:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: react-nvim-dev:1.0
+    ports:
+      - "5173:5173"
+    environment:
+      - TZ=Asia/Taipei
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
