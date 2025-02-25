@@ -76,8 +76,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 RUN mkdir -p ~/.local/share/nvim/lazy/nvim-treesitter/parser && \
     mkdir -p ~/.local/state/nvim && \
     chmod -R 755 ~/.local/share/nvim && \
-    chmod -R 755 ~/.local/state/nvim && \
-    mkdir -p /apps
+    chmod -R 755 ~/.local/state/nvim
 
 # Setup LazyVim
 RUN git clone https://github.com/LazyVim/starter ~/.config/nvim && \
