@@ -10,13 +10,17 @@
 - 透過多架構映像實現跨平台支援
 - Treesitter 提供增強的語法高亮
 - Lazygit 用於 Git 操作
+- ImageMagick 和 Ghostscript 用於處理圖像和文檔
+- Mermaid 圖表支持
+- SQLite3 用於數據存儲
 
 ## 使用方式
 
 ### 參數說明
 
-- `<name>`: 專案名稱，例如 my-project
-- `<port>`: 開發伺服器端口，例如 -p 5173:5173
+- `<name>`: 容器名稱，例如 my-project
+- `<host_port>`: 主機端口（可選），例如 5173
+- `<container_port>`: 容器內端口（可選），例如 5173
 
 ### 執行容器
 
@@ -24,13 +28,12 @@
 
 ```bash
 # 建立並啟動具有持久磁碟區的容器
-docker run -d --name <name> -p <port> -v application:/apps nvim-node:0.10.4-node20 tail -f /dev/null
+docker run -d --name <name> [-p <host_port>:<container_port>] -v application:/apps nvim-node:0.10.4-node20 tail -f /dev/null
 
 # 進入容器
-docker exec -it nvim-dev bash
+docker exec -it <name> bash
 
 # 在容器內
-source ~/.bashrc  # 載入環境變數
 cd /apps          # 進入應用程式目錄
 nvim              # 啟動 Neovim
 ```
@@ -44,8 +47,8 @@ nvim              # 啟動 Neovim
    ```bash
    # 在容器內
    cd /apps
-   mkdir <name>
-   cd <name>
+   mkdir <project-name>
+   cd <project-name>
    nvim .
    ```
 
@@ -53,11 +56,11 @@ nvim              # 啟動 Neovim
 
    ```bash
    # 停止容器
-   docker stop nvim-dev
+   docker stop <name>
 
    # 之後再次啟動
-   docker start nvim-dev
-   docker exec -it nvim-dev bash
+   docker start <name>
+   docker exec -it <name> bash
    ```
 
 ## SSH 設定與授權
@@ -108,6 +111,7 @@ docker buildx build --platform linux/amd64,linux/arm64 \
 - **不污染主機檔案系統**：所有專案檔案都留在容器內
 - **持久性**：您的工作安全地存儲在 Docker 磁碟區中
 - **可攜性**：通過推送/拉取 Docker 映像，可以在不同機器上處理相同的專案
+- **性能優化**：在 Windows 環境下使用 Docker 磁碟區可避免檔案系統性能問題
 
 ## 進階用法
 
@@ -142,5 +146,5 @@ npm install -g typescript typescript-language-server
 2. 推送到遠端倉庫
 3. 或使用 Docker cp 將配置複製到另一個位置：
    ```bash
-   docker cp nvim-dev:/root/.config/nvim ./my-nvim-config
+   docker cp <name>:/root/.config/nvim ./my-nvim-config
    ```
