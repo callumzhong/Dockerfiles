@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM ubuntu:24.04
 
 # Set build arguments
 ARG DEBIAN_FRONTEND=noninteractive
@@ -59,7 +59,7 @@ RUN npm install -g @mermaid-js/mermaid-cli
 
 # Download and install Neovim
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
-      export NVIM_ARCH="aarch64"; \
+      export NVIM_ARCH="arm64"; \
     else \
       export NVIM_ARCH="x86_64"; \
     fi && \
@@ -101,5 +101,5 @@ LABEL description="Optimized Neovim ${NVIM_VERSION} with Node.js ${NODE_VERSION}
 
 # Use:
 # - docker build -t nvim-node:0.10.4-node20 .
-# - docker run -d --name <name> [-p <host_port>:<container_port>] -v application:/apps nvim-node:0.10.4-node20 tail -f /dev/null
+# - d
 # - docker exec -it <name> bash
