@@ -13,8 +13,8 @@ ENV LC_ALL=C.UTF-8
 ENV TZ=${TZ}
 
 # Install base system packages
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     git \
     curl \
     wget \
@@ -38,24 +38,19 @@ RUN apt-get install -y --no-install-recommends \
     ghostscript \
     fish \
     sqlite3 \
-    libsqlite3-dev
+    libsqlite3-dev && \
+    ln -s $(which fdfind) /usr/local/bin/fd && \
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
 
-
-# Create symbolic link for fd
-RUN ln -s $(which fdfind) /usr/local/bin/fd
-
-# Set up locale
-RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-RUN locale-gen
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
-RUN apt-get update
-RUN apt-get install -y nodejs
-RUN npm install -g npm@latest
-RUN npm install -g tree-sitter-cli
-RUN npm install -g neovim
-RUN npm install -g @mermaid-js/mermaid-cli
+# Install Node.js and related tools
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get update && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    npm install -g tree-sitter-cli && \
+    npm install -g neovim && \
+    npm install -g @mermaid-js/mermaid-cli
 
 # Download and install Neovim
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
@@ -83,15 +78,14 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     rm lazygit.tar.gz
 
 # Install LazyVim
-RUN mkdir -p /root/.config/nvim
-RUN git clone --depth 1 https://github.com/LazyVim/starter /root/.config/nvim
-RUN rm -rf /root/.config/nvim/.git
+RUN git clone https://github.com/LazyVim/starter ~/.config/nvim && \
+    rm -rf ~/.config/nvim/.git
 
 # Clean up unnecessary files to reduce image size
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-RUN rm -rf /tmp/*
-RUN rm -rf ~/.cache
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /tmp/* && \
+    rm -rf ~/.cache
 
 # Set default command
 CMD ["bash"]
@@ -101,5 +95,5 @@ LABEL description="Optimized Neovim ${NVIM_VERSION} with Node.js ${NODE_VERSION}
 
 # Use:
 # - docker build -t nvim-node:0.10.4-node20 .
-# - d
+# - docker run -d --name <name> [-p <host_port>:<container_port>] -v application:/apps nvim-node:0.10.4-node20 tail -f /dev/null
 # - docker exec -it <name> bash
